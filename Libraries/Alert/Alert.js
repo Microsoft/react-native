@@ -10,7 +10,7 @@
 
 'use strict';
 
-import AlertMacOS from './AlertMacOS'; // TODO(macOS ISS#2323203)
+import {type DefaultInputsArray} from './AlertMacOS'; // TODO(macOS ISS#2323203)
 import Platform from '../Utilities/Platform';
 import NativeDialogManagerAndroid, {
   type DialogOptions,
@@ -33,6 +33,10 @@ export type Buttons = Array<{
 type Options = {
   cancelable?: ?boolean,
   onDismiss?: ?() => void,
+  // [TODO(macOS ISS#2323203)
+  modal?: ?boolean,
+  critical?: ?boolean,
+  // ]TODO(macOS ISS#2323203)
   ...
 };
 
@@ -48,11 +52,20 @@ class Alert {
     buttons?: Buttons,
     options?: Options,
   ): void {
-    if (
-      Platform.OS === 'ios' ||
-      Platform.OS === 'macos' /* TODO(macOS ISS#2323203) */
-    ) {
+    if (Platform.OS === 'ios') {
       Alert.prompt(title, message, buttons, 'default');
+      // [TODO(macOS ISS#2323203)
+    } else if (Platform.OS === 'macos') {
+      promptMacOS(
+        title,
+        message,
+        buttons,
+        'default',
+        undefined,
+        options?.modal,
+        options?.critical,
+      );
+      // ]TODO(macOS ISS#2323203)
     } else if (Platform.OS === 'android') {
       if (!NativeDialogManagerAndroid) {
         return;
@@ -156,10 +169,53 @@ class Alert {
       // [TODO(macOS ISS#2323203)
     } else if (Platform.OS === 'macos') {
       const defaultInputs = [{default: defaultValue}];
-      AlertMacOS.prompt(title, message, callbackOrButtons, type, defaultInputs);
+      promptMacOS(title, message, callbackOrButtons, type, defaultInputs);
     }
     // ]TODO(macOS ISS#2323203)
   }
 }
+
+// [TODO(macOS ISS#2323203)
+function promptMacOS(
+  title: ?string,
+  message?: ?string,
+  callbackOrButtons?: ?((text: string) => void) | Buttons,
+  type?: ?AlertType = 'plain-text',
+  defaultInputs?: DefaultInputsArray,
+  modal?: ?boolean,
+  critical?: ?boolean,
+): void {
+  let callbacks = [];
+  const buttons = [];
+  if (typeof callbackOrButtons === 'function') {
+    callbacks = [callbackOrButtons];
+  } else if (callbackOrButtons instanceof Array) {
+    callbackOrButtons.forEach((btn, index) => {
+      callbacks[index] = btn.onPress;
+      if (btn.text || index < (callbackOrButtons || []).length - 1) {
+        const btnDef = {};
+        btnDef[index] = btn.text || '';
+        buttons.push(btnDef);
+      }
+    });
+  }
+
+  RCTAlertManager.alertWithArgs(
+    {
+      title: title || undefined,
+      message: message || undefined,
+      buttons,
+      type: type || undefined,
+      defaultInputs,
+      modal: modal || undefined,
+      critical: critical || undefined,
+    },
+    (id, value) => {
+      const cb = callbacks[id];
+      cb && cb(value);
+    },
+  );
+}
+// ]TODO(macOS ISS#2323203)
 
 module.exports = Alert;

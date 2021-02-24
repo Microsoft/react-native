@@ -14,6 +14,7 @@
 'use strict';
 
 import type {AlertType, AlertButtonStyle} from './Alert';
+import warnOnce from '../Utilities/warnOnce';
 
 var RCTAlertManager = require('../BatchedBridge/NativeModules').AlertManager;
 
@@ -176,6 +177,11 @@ class AlertMacOS {
     modal?: ?boolean,
     critical?: ?boolean,
   ): void {
+    warnOnce(
+      'deprecated-AlertMacOS',
+      '"AlertMacOS" module has been deprecated in favor of "Alert" and will be removed in a future version of react-native-macos',
+    );
+
     var callbacks = [];
     var buttons = [];
     if (typeof callbackOrButtons === 'function') {
