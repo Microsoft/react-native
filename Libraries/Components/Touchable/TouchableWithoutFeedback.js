@@ -23,6 +23,7 @@ import type {
   AccessibilityValue,
 } from '../../Components/View/ViewAccessibility';
 import type {EdgeInsetsProp} from '../../StyleSheet/EdgeInsetsPropType';
+import type {CursorValue} from '../../StyleSheet/StyleSheetTypes';
 import type {
   BlurEvent,
   FocusEvent,
@@ -54,6 +55,7 @@ type Props = $ReadOnly<{|
   accessibilityViewIsModal?: ?boolean,
   accessible?: ?boolean,
   children?: ?React.Node,
+  cursor?: ?CursorValue,
   delayLongPress?: ?number,
   delayPressIn?: ?number,
   delayPressOut?: ?number,

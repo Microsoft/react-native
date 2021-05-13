@@ -1380,6 +1380,74 @@ setBorderColor() setBorderColor(Top) setBorderColor(Right) setBorderColor(Bottom
 #pragma mark - macOS Event Handler
 
 #if TARGET_OS_OSX
+- (void)resetCursorRects
+{
+  NSCursor *cursor;
+
+  switch (self.cursor) {
+    case RCTCursorArrow:
+      cursor = [NSCursor arrowCursor];
+      break;
+    case RCTCursorClosedHand:
+      cursor = [NSCursor closedHandCursor];
+      break;
+    case RCTCursorContextualMenu:
+      cursor = [NSCursor contextualMenuCursor];
+      break;
+    case RCTCursorCrosshair:
+      cursor = [NSCursor crosshairCursor];
+      break;
+    case RCTCursorDisappearingItem:
+      cursor = [NSCursor disappearingItemCursor];
+      break;
+    case RCTCursorDragCopy:
+      cursor = [NSCursor dragCopyCursor];
+      break;
+    case RCTCursorDragLink:
+      cursor = [NSCursor dragLinkCursor];
+      break;
+    case RCTCursorIBeam:
+      cursor = [NSCursor IBeamCursor];
+      break;
+    case RCTCursorIBeamCursorForVerticalLayout:
+      cursor = [NSCursor IBeamCursorForVerticalLayout];
+      break;
+    case RCTCursorOpenHand:
+      cursor = [NSCursor openHandCursor];
+      break;
+    case RCTCursorOperationNotAllowed:
+      cursor = [NSCursor operationNotAllowedCursor];
+      break;
+    case RCTCursorPointingHand:
+      cursor = [NSCursor pointingHandCursor];
+      break;
+    case RCTCursorResizeDown:
+      cursor = [NSCursor resizeDownCursor];
+      break;
+    case RCTCursorResizeLeft:
+      cursor = [NSCursor resizeLeftCursor];
+      break;
+    case RCTCursorResizeLeftRight:
+      cursor = [NSCursor resizeLeftRightCursor];
+      break;
+    case RCTCursorResizeRight:
+      cursor = [NSCursor resizeRightCursor];
+      break;
+    case RCTCursorResizeUp:
+      cursor = [NSCursor resizeUpCursor];
+      break;
+    case RCTCursorResizeUpDown:
+      cursor = [NSCursor resizeUpDownCursor];
+      break;
+  }
+
+  [self discardCursorRects];
+
+  if (cursor) {
+    [self addCursorRect:self.bounds cursor:cursor];
+  }
+}
+
 - (void)setOnDoubleClick:(RCTDirectEventBlock)block
 {
   if (_onDoubleClick != block) {
