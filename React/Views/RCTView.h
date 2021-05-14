@@ -124,6 +124,8 @@ extern const UIAccessibilityTraits SwitchAccessibilityTrait;
  */
 @property (nonatomic, assign) UIEdgeInsets hitTestEdgeInsets;
 
+@property (nonatomic, assign) CATransform3D transform3D;
+
 #if TARGET_OS_OSX // [TODO(macOS ISS#2323203)
 /**
  * macOS Properties

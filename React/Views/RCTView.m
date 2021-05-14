@@ -162,6 +162,7 @@ static NSString *RCTRecursiveAccessibilityLabel(RCTUIView *view) // TODO(macOS I
     _borderBottomEndRadius = -1;
     _borderStyle = RCTBorderStyleSolid;
     _hitTestEdgeInsets = UIEdgeInsetsZero;
+    _transform3D = CATransform3DIdentity;
 
     _backgroundColor = super.backgroundColor;
   }
@@ -1164,6 +1165,17 @@ static CGFloat RCTDefaultIfNegativeTo(CGFloat defaultValue, CGFloat x)
   backgroundColor = _backgroundColor.CGColor;
 #endif
 
+  #if TARGET_OS_OSX // [TODO(macOS ISS#2323203)
+  CATransform3D transform = self.transform3D;
+  if (layer.anchorPoint.x == 0 && layer.anchorPoint.y == 0 && !CATransform3DEqualToTransform(transform, CATransform3DIdentity)) {
+    // This compensates for the fact that layer.anchorPoint is {0, 0} instead of {0.5, 0.5} on macOS for some reason.
+    CATransform3D originAdjust = CATransform3DTranslate(CATransform3DIdentity, self.frame.size.width / 2, self.frame.size.height / 2, 0);
+    transform = CATransform3DConcat(CATransform3DConcat(CATransform3DInvert(originAdjust), transform), originAdjust);
+    // Enable edge antialiasing in perspective transforms
+    layer.allowsEdgeAntialiasing = !(transform.m34 == 0.0f);
+  }
+  layer.transform = transform;
+  #endif // ]TODO(macOS ISS#2323203)
   if (useIOSBorderRendering) {
     layer.cornerRadius = cornerRadii.topLeft;
     layer.borderColor = borderColors.left;
